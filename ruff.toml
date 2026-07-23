@@ -1,0 +1,13 @@
+# Ruff configuration for the KanMind backend.
+# Line length 79 (PEP8). Generated migrations are excluded.
+
+line-length = 79
+target-version = "py313"
+extend-exclude = ["**/migrations/**"]
+
+[lint]
+extend-select = ["E", "W", "I"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
