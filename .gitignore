@@ -9,4 +9,4 @@ db.sqlite3
 CLAUDE.md
 .claude/
 docs/
-DEVIATIONS.md
+.ruff_cache
