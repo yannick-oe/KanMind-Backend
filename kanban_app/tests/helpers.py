@@ -3,16 +3,64 @@
 from datetime import date
 
 from auth_app.models import User
-from kanban_app.models import Board, Task, TaskPriority, TaskStatus
+from kanban_app.models import (
+    Board,
+    Comment,
+    Task,
+    TaskPriority,
+    TaskStatus,
+)
 
 DEFAULT_PASSWORD = "secretpass"
 DEFAULT_DUE_DATE = date(2026, 12, 31)
 BOARDS_URL = "/api/boards/"
+TASKS_URL = "/api/tasks/"
+ASSIGNED_URL = "/api/tasks/assigned-to-me/"
+REVIEWING_URL = "/api/tasks/reviewing/"
+
+TASK_LIST_FIELD_ORDER = [
+    "id",
+    "board",
+    "title",
+    "description",
+    "status",
+    "priority",
+    "assignee",
+    "reviewer",
+    "due_date",
+    "comments_count",
+]
+TASK_PATCH_FIELD_ORDER = [
+    "id",
+    "title",
+    "description",
+    "status",
+    "priority",
+    "assignee",
+    "reviewer",
+    "due_date",
+]
+COMMENT_FIELD_ORDER = ["id", "created_at", "author", "content"]
 
 
 def board_detail_url(board_id):
     """Return the detail URL for a board id."""
     return f"/api/boards/{board_id}/"
+
+
+def task_detail_url(task_id):
+    """Return the detail URL for a task id."""
+    return f"/api/tasks/{task_id}/"
+
+
+def task_comments_url(task_id):
+    """Return the comments URL for a task id."""
+    return f"/api/tasks/{task_id}/comments/"
+
+
+def comment_detail_url(task_id, comment_id):
+    """Return the delete URL for a comment on a task."""
+    return f"/api/tasks/{task_id}/comments/{comment_id}/"
 
 
 def make_user(email, fullname="Test User"):
@@ -43,3 +91,8 @@ def make_task(
         due_date=extra.pop("due_date", DEFAULT_DUE_DATE),
         **extra,
     )
+
+
+def make_comment(task, author, content="A comment"):
+    """Create a comment on a task."""
+    return Comment.objects.create(task=task, author=author, content=content)

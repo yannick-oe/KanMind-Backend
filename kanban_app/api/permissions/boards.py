@@ -1,6 +1,13 @@
-"""Access-control rules for the board endpoints."""
+"""Board access-control rules."""
 
 from rest_framework.permissions import BasePermission
+
+
+def user_is_board_participant(user, board):
+    """Return True if the user owns or is a member of the board."""
+    if board.owner_id == user.id:
+        return True
+    return board.members.filter(pk=user.id).exists()
 
 
 class IsBoardOwnerOrMember(BasePermission):

@@ -1,84 +1,19 @@
 """API views for the board endpoints."""
 
-from django.db.models import (
-    Count,
-    IntegerField,
-    OuterRef,
-    Prefetch,
-    Q,
-    Subquery,
-)
-from django.db.models.functions import Coalesce
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..models import Board, Task, TaskPriority, TaskStatus
-from .permissions import IsBoardOwner, IsBoardOwnerOrMember
-from .serializers import (
+from ...models import Board
+from ..permissions import IsBoardOwner, IsBoardOwnerOrMember
+from ..selectors import board_detail_queryset, board_list_queryset
+from ..serializers import (
     BoardCreateSerializer,
     BoardDetailSerializer,
     BoardListSerializer,
     BoardPatchResponseSerializer,
     BoardUpdateSerializer,
 )
-
-
-def _member_count_subquery():
-    """Return a correlated subquery counting a board's members."""
-    through = Board.members.through
-    counts = (
-        through.objects.filter(board_id=OuterRef("pk"))
-        .values("board_id")
-        .annotate(total=Count("id"))
-        .values("total")
-    )
-    return Coalesce(Subquery(counts, output_field=IntegerField()), 0)
-
-
-def _annotate_counts(queryset):
-    """Annotate boards with member and task aggregate counts."""
-    return queryset.annotate(
-        member_count=_member_count_subquery(),
-        ticket_count=Count("tasks", distinct=True),
-        tasks_to_do_count=Count(
-            "tasks",
-            filter=Q(tasks__status=TaskStatus.TODO),
-            distinct=True,
-        ),
-        tasks_high_prio_count=Count(
-            "tasks",
-            filter=Q(tasks__priority=TaskPriority.HIGH),
-            distinct=True,
-        ),
-    )
-
-
-def visible_board_ids(user):
-    """Return ids of boards where the user is owner or member."""
-    return (
-        Board.objects.filter(Q(owner=user) | Q(members=user))
-        .values("id")
-        .distinct()
-    )
-
-
-def board_list_queryset(user):
-    """Build the annotated queryset for the board list endpoint."""
-    boards = Board.objects.filter(pk__in=visible_board_ids(user))
-    return _annotate_counts(boards).order_by("id")
-
-
-def board_detail_queryset():
-    """Build the prefetched queryset for the board detail view."""
-    tasks = (
-        Task.objects.select_related("assignee", "reviewer")
-        .annotate(comments_count=Count("comments", distinct=True))
-        .order_by("id")
-    )
-    return Board.objects.prefetch_related(
-        Prefetch("tasks", queryset=tasks), "members"
-    )
 
 
 class BoardListCreateView(generics.ListCreateAPIView):

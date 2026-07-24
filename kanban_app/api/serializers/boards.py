@@ -5,7 +5,7 @@ from rest_framework import serializers
 from auth_app.api.serializers import UserNestedSerializer
 from auth_app.models import User
 
-from ..models import Board, Task
+from ...models import Board, Task
 
 
 class BoardListSerializer(serializers.ModelSerializer):
