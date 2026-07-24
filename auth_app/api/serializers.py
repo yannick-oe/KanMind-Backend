@@ -59,3 +59,11 @@ class AuthResponseSerializer(serializers.Serializer):
     fullname = serializers.CharField(source="user.fullname")
     email = serializers.EmailField(source="user.email")
     user_id = serializers.IntegerField(source="user.id")
+
+
+class UserNestedSerializer(serializers.ModelSerializer):
+    """Compact user representation reused across the API."""
+
+    class Meta:
+        model = User
+        fields = ["id", "email", "fullname"]

@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from .views import LoginView, RegistrationView
+from .views import EmailCheckView, LoginView, RegistrationView
 
 urlpatterns = [
     path(
@@ -11,4 +11,5 @@ urlpatterns = [
         name="registration",
     ),
     path("login/", LoginView.as_view(), name="login"),
+    path("email-check/", EmailCheckView.as_view(), name="email-check"),
 ]
