@@ -1,0 +1,14 @@
+# Coverage configuration for the KanMind backend.
+# Measures the application code in auth_app and kanban_app only.
+
+[run]
+source =
+    auth_app
+    kanban_app
+omit =
+    */migrations/*
+    */tests/*
+
+[report]
+show_missing = true
+skip_covered = false
