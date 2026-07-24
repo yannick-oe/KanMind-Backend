@@ -4,11 +4,14 @@ from rest_framework import serializers
 
 from ...models import Comment
 
-EMPTY_CONTENT_ERROR = "The comment content must not be empty."
-
 
 class CommentSerializer(serializers.ModelSerializer):
-    """Comment representation for listing and creation."""
+    """Comment representation for listing and creation.
+
+    Empty or whitespace-only content is rejected with 400 by the
+    ``CharField`` default (``trim_whitespace`` plus ``allow_blank``),
+    so no extra validator is needed.
+    """
 
     author = serializers.CharField(source="author.fullname", read_only=True)
 
@@ -16,9 +19,3 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ["id", "created_at", "author", "content"]
         read_only_fields = ["id", "created_at"]
-
-    def validate_content(self, value):
-        """Reject empty or whitespace-only content."""
-        if not value.strip():
-            raise serializers.ValidationError(EMPTY_CONTENT_ERROR)
-        return value
