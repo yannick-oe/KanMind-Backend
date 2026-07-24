@@ -41,14 +41,19 @@ pip install -r requirements.txt
 # 4. Create the environment file
 cp .env.example .env
 
-# 5. Generate a SECRET_KEY and paste it into .env
-#    (an empty SECRET_KEY stops Django from starting)
+# 5. Generate a SECRET_KEY and paste it into .env wrapped in SINGLE QUOTES:
+#      SECRET_KEY='<generated-key>'
+#    The quotes matter: generated keys may contain # or $, which the .env
+#    parser would otherwise treat as a comment or a variable reference.
+#    An empty SECRET_KEY stops Django from starting.
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
 # 6. Apply migrations
 python manage.py migrate
 
-# 7. Create an admin user (prompts for email, fullname, password)
+# 7. Create an admin user (prompts for email, fullname, password).
+#    Use a two-word fullname such as "Max Mustermann" — the frontend
+#    derives initials from it and fails on a single-word name.
 python manage.py createsuperuser
 
 # 8. Seed the frontend guest user
@@ -59,6 +64,7 @@ python manage.py runserver
 ```
 
 The API is then available at `http://127.0.0.1:8000/api/`.
+The Django admin is available at `http://127.0.0.1:8000/admin/`.
 
 ## Environment variables
 
