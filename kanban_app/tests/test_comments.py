@@ -90,6 +90,16 @@ class CommentCreateTests(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_blank_content_is_400(self):
+        """Truly empty content is rejected with 400."""
+        self.client.force_authenticate(user=self.member)
+        response = self.client.post(
+            task_comments_url(self.task.id),
+            {"content": ""},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
 
 class CommentDeleteTests(APITestCase):
     """Cover DELETE /api/tasks/{id}/comments/{comment_id}/."""

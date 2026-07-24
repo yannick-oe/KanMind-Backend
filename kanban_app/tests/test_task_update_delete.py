@@ -80,6 +80,17 @@ class TaskPatchTests(APITestCase):
         )
         self.assertIsNone(response.json()["assignee"])
 
+    def test_non_member_reviewer_is_rejected(self):
+        """A reviewer outside the board is rejected with 400."""
+        outsider = make_user("out@x.com")
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.patch(
+            task_detail_url(self.task.id),
+            {"reviewer_id": outsider.id},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
 
 class TaskDeleteTests(APITestCase):
     """Cover the task delete endpoint."""
